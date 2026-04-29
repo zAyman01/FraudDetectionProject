@@ -36,10 +36,6 @@ FraudDetectionProject/
     04_models.ipynb
     05_evaluation.ipynb
   src/
-    preprocessing.py
-    features.py
-    models.py
-    evaluation.py
   results/
     figures/
     metrics/
