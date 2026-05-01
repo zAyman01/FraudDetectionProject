@@ -9,3 +9,4 @@ ipython
 joblib
 xgboost
 lightgbm
+pyarrow
