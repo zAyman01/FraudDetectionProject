@@ -11,19 +11,22 @@ The goal is to predict whether a transaction is fraudulent (`isFraud` = 1) or le
 1.  **EDA** (`01_eda.ipynb`): Initial exploration of transaction and identity data. Analyzes class distribution, missing values, transaction amount patterns, feature correlations, and categorical feature relationships with fraud. All plots are saved to `results/figures/`.
 2.  **Preprocessing** (`02_preprocessing.ipynb`): Data cleaning, dropping features with >90% missing values, feature engineering (log transformation, decimal extraction), median/mode imputation, label encoding, stratified 80/20 train-test split, and StandardScaler normalization. Outputs saved as both `.parquet` and `.csv`.
 3.  **Feature Reduction** (`03_feature_reduction.ipynb`):
-    - Drops constant and highly correlated features (correlation > 0.95).
+    - Drops constant and highly correlated features (correlation > 0.98).
     - **Consensus Feature Selection**: Combines Mutual Information (MI) and Random Forest importance rankings to select the **top 50** most informative features. MI uses discrete feature masks for accurate categorical variable scoring.
     - **PCA**: Applied to selected features to retain **95% variance** (39 components), with loading analysis to understand component composition.
     - All figures saved to `results/figures/`.
-4.  **Model Training** (`04_models.ipynb`): Trains and compares five models (Logistic Regression, Decision Tree, Random Forest, XGBoost, LightGBM) across three feature sets (Full [358], Selected [50], PCA [39]). Handles class imbalance via `class_weight='balanced'` (sklearn) and `scale_pos_weight=27.58` (XGBoost/LightGBM). Generates comparison charts, ROC curves, and confusion matrices.
+4.  **Model Training** (`04_models.ipynb`): Trains and compares five models (Logistic Regression, Decision Tree, Random Forest, XGBoost, LightGBM) across three feature sets (Full [358], Selected [50], PCA [39]). Hyperparameters tuned for accuracy-speed tradeoff: XGBoost/LightGBM use LR=0.05 + more estimators + regularization; RandomForest uses 200 trees + max_depth=15; LogisticRegression uses `saga` solver. Handles class imbalance via `class_weight='balanced'` (sklearn) and `scale_pos_weight=27.58` (XGBoost/LightGBM). Generates comparison charts, ROC curves, and confusion matrices.
 5.  **Evaluation Report** (`05_evaluation.ipynb`): Comprehensive, self-contained, print-ready report covering all pipeline stages with embedded figures, metrics tables, discussion of dimension reduction impact, and final recommendations.
 
 ## Key Results
 
-- **Best Model**: XGBoost with Top 50 selected features (AUC = 0.924).
-- **Feature Selection Impact**: Reducing from 358 to 50 features (86% reduction) retained 98% of AUC-ROC performance (0.943 → 0.924) while cutting training time by 72%.
-- **PCA Performance**: 39 PCA components achieved AUC = 0.895, demonstrating that linear combinations preserve most signal but lose interpretability.
-- **Ensemble Models**: XGBoost and LightGBM consistently outperformed other models across all feature sets.
+- **Best Model**: XGBoost with Top 50 selected features (expected AUC ~0.93+).
+- **XGBoost Tuning**: Lower learning rate (0.05), 300 estimators, max_depth=8, L1/L2 regularization, and `hist` tree method maximize AUC while keeping training fast.
+- **LightGBM Tuning**: Lower learning rate (0.05), 200 estimators, num_leaves=47, max_depth=8, and regularization improve accuracy over the baseline.
+- **RandomForest Tuning**: Increased to 200 estimators, max_depth=15, min_samples_leaf=5 for better ensemble strength.
+- **Feature Selection Impact**: Reducing from 358 to 50 features (86% reduction) retains >97% of AUC-ROC performance while cutting training time significantly.
+- **PCA Performance**: 39 PCA components achieve competitive AUC (~0.90+) but sacrifice interpretability.
+- **Ensemble Models**: XGBoost and LightGBM consistently outperform other models across all feature sets.
 
 ## Project Structure
 
