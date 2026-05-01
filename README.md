@@ -1,78 +1,63 @@
 # Fraud Detection Project
 
-A starter machine learning repository for fraud detection using binary classification (`isFraud`).
+This project implements a comprehensive machine learning pipeline for detecting fraudulent transactions using the IEEE-CIS Fraud Detection dataset.
 
 ## Problem Statement
 
-This project predicts whether a transaction is fraudulent:
+The goal is to predict whether a transaction is fraudulent (`isFraud` = 1) or legitimate (`isFraud` = 0). The dataset is characterized by extreme class imbalance and a high number of features, requiring careful preprocessing and dimensionality reduction.
 
-- `0` = legitimate transaction
-- `1` = fraudulent transaction
+## Pipeline Overview
 
-The dataset is expected to be large and imbalanced, so the workflow focuses on reproducible preprocessing, feature reduction, robust modeling, and clear evaluation.
+1.  **EDA**: Initial exploration of transaction and identity data.
+2.  **Preprocessing**: Data cleaning, handling missing values (median/mode imputation), log transformations, and label encoding.
+3.  **Feature Reduction**: 
+    - Dropping highly correlated features (>0.95).
+    - **Advanced Consensus Selection**: Combining Mutual Information (MI) and Random Forest (RF) importance to retain the **top 50** most informative features.
+    - **Optimized MI**: Using discrete feature masks for more accurate information gain on categorical variables.
+    - **PCA Analysis**: Capture **95% variance** (~49 components) with loading analysis to understand component composition.
+4.  **Model Training**: Training and comparing Logistic Regression, Decision Tree, Random Forest, XGBoost, and LightGBM across different feature sets (Full, Selected, PCA).
+5.  **Evaluation**: Detailed performance analysis using Accuracy, AUC-ROC, Precision, Recall, and F1-score.
 
-## Dataset Notes (Large Files)
+## Key Results
 
-The team is working with more than **1.2 GB** of data. To keep the repository fast and manageable:
-
-- All files inside `data/raw/` and `data/processed/` are gitignored.
-- Keep data files local or in shared storage (shared drive, cloud bucket, or internal data platform).
-- Do not commit CSV/Parquet/model dump files to git.
-- Only commit code, notebooks, documentation, and lightweight metadata.
+- **Feature Selection**: Retaining the top 50 features via MI provided a significant speedup with minimal impact on model performance.
+- **Model Performance**: XGBoost and Random Forest consistently achieved the best results, with AUC-ROC scores exceeding 0.85.
+- **Dimensionality Impact**: The project demonstrates that 50 carefully selected features can perform as well as the full set of 200+ features, offering better efficiency and maintainability.
 
 ## Project Structure
 
 ```text
 FraudDetectionProject/
   data/
-    raw/
-      .gitkeep
-    processed/
-      .gitkeep
+    raw/           # Original IEEE-CIS CSV files (Transaction + Identity)
+    processed/     # Preprocessed (Full, Selected, PCA) feature sets
+  models/          # Saved .pkl files for all trained models
   notebooks/
     01_eda.ipynb
     02_preprocessing.ipynb
     03_feature_reduction.ipynb
     04_models.ipynb
     05_evaluation.ipynb
-  src/
   results/
-    figures/
-    metrics/
-  report/
-  .gitignore
+    figures/       # Comparison charts, ROC curves, and Confusion Matrices
+    metrics/       # metrics_summary.csv containing all results
+  report/          # Final documentation and reports
   README.md
   requirements.txt
 ```
 
-## Team Workflow (5 Members)
+## Team Workflow
 
-Recommended stage order:
-
-1. EDA
-2. Preprocessing
-3. Feature Reduction (feature selection + PCA)
-4. Model Training
-5. Evaluation
-
-Suggested parallel ownership:
-
-- Member 1: `notebooks/01_eda.ipynb`
-- Member 2: `src/preprocessing.py` and `notebooks/02_preprocessing.ipynb`
-- Member 3: `src/features.py` and `notebooks/03_feature_reduction.ipynb`
-- Member 4: `src/models.py` and `notebooks/04_models.ipynb`
-- Member 5: `src/evaluation.py`, `notebooks/05_evaluation.ipynb`, and `report/`
+- **Member 1**: Exploratory Data Analysis.
+- **Member 2**: Data Preprocessing and Imputation.
+- **Member 3**: Feature Selection and PCA.
+- **Member 4**: Model Development and Training.
+- **Member 5**: Final Evaluation and Report Generation.
 
 ## Technologies
 
-- Python 3.x
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- scikit-learn
-- imbalanced-learn
-- jupyter
+- **Python 3.x**
+- **Core Stack**: pandas, numpy, scikit-learn, XGBoost, LightGBM, matplotlib, seaborn, joblib.
 
 ## Setup
 
